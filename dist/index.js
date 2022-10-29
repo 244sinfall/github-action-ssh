@@ -116,14 +116,18 @@ function executeCommand(ssh, command) {
             }
             else {
                 console.log('Command seems to be a long running process');
+                let timeout;
                 yield ssh.exec(command, [], {
                     stream: "both",
                     onStdout(chunk) {
                         console.log(chunk.toString('utf8'));
-                        console.log('✅ Received feed back from the terminal. Process seem to be started.');
-                        if (ssh.isConnected()) {
-                            ssh.dispose();
-                        }
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            console.log('✅ Received feed back from the terminal. Process seem to be started.');
+                            if (ssh.isConnected()) {
+                                ssh.dispose();
+                            }
+                        }, 10000);
                     },
                     onStderr(chunk) {
                         console.log(chunk.toString("utf-8"));
