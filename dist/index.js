@@ -109,13 +109,21 @@ function executeCommand(ssh, command) {
                 if (code > 0) {
                     throw Error(`Command exited with code ${code}`);
                 }
+                console.log('✅ SSH Action finished.');
+                if (ssh.isConnected()) {
+                    ssh.dispose();
+                }
             }
             else {
-                ssh.exec(command, []);
-            }
-            console.log('✅ SSH Action finished.');
-            if (ssh.isConnected()) {
-                ssh.dispose();
+                yield ssh.exec(command, [], {
+                    stream: "stdout",
+                    onStdout() {
+                        console.log('✅ Received feed back from the terminal. Process seem to be started.');
+                        if (ssh.isConnected()) {
+                            ssh.dispose();
+                        }
+                    }
+                });
             }
         }
         catch (err) {
@@ -7305,14 +7313,14 @@ class Client extends EventEmitter {
       this.emit('close');
 
       // Notify outstanding channel requests of disconnection ...
-      // const callbacks_ = callbacks;
-      // callbacks = this._callbacks = [];
-      // const err = new Error('No response from server');
-      // for (let i = 0; i < callbacks_.length; ++i)
-      //   callbacks_[i](err);
+      const callbacks_ = callbacks;
+      callbacks = this._callbacks = [];
+      const err = new Error('No response from server');
+      for (let i = 0; i < callbacks_.length; ++i)
+        callbacks_[i](err);
 
       // Simulate error for any channels waiting to be opened
-      // this._chanMgr.cleanup(err);
+      this._chanMgr.cleanup(err);
     });
 
     // Begin authentication handling ===========================================

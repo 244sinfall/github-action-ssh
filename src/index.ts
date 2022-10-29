@@ -85,13 +85,22 @@ async function executeCommand(ssh: NodeSSH, command: string) {
       if (code > 0) {
         throw Error(`Command exited with code ${code}`);
       }
+      console.log('✅ SSH Action finished.');
+      if (ssh.isConnected()) {
+        ssh.dispose()
+      }
     } else {
-      ssh.exec(command, [])
+      await ssh.exec(command, [], {
+        stream: "stdout",
+        onStdout() {
+          console.log('✅ Received feed back from the terminal. Process seem to be started.');
+          if (ssh.isConnected()) {
+            ssh.dispose()
+          }
+        }
+      });
     }
-    console.log('✅ SSH Action finished.');
-    if (ssh.isConnected()) {
-      ssh.dispose()
-    }
+
   } catch (err) {
     console.error(
       `⚠️ An error happened executing command ${command}.`,
