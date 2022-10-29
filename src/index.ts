@@ -90,13 +90,18 @@ async function executeCommand(ssh: NodeSSH, command: string) {
         ssh.dispose()
       }
     } else {
+      console.log('Command seems to be a long running process')
       await ssh.exec(command, [], {
-        stream: "stdout",
-        onStdout() {
+        stream: "both",
+        onStdout(chunk) {
+          console.log(chunk.toString('utf8'));
           console.log('✅ Received feed back from the terminal. Process seem to be started.');
           if (ssh.isConnected()) {
             ssh.dispose()
           }
+        },
+        onStderr(chunk){
+          console.log(chunk.toString("utf-8"))
         }
       });
     }
