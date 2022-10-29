@@ -70,18 +70,23 @@ async function executeCommand(ssh: NodeSSH, command: string) {
   console.log(`Executing command: ${command}`);
 
   try {
-    const {code} = await ssh.exec(command, [], {
-      stream: 'both',
-      onStdout(chunk) {
-        console.log(chunk.toString('utf8'));
-      },
-      onStderr(chunk) {
-        console.log(chunk.toString('utf8'));
-      }
-    });
+    // If I want to run process in the background, I dont want to wait process to terminate to finish my workflow
+    if(!command.endsWith(" &")) {
+      const {code} = await ssh.exec(command, [], {
+        stream: 'both',
+        onStdout(chunk) {
+          console.log(chunk.toString('utf8'));
+        },
+        onStderr(chunk) {
+          console.log(chunk.toString('utf8'));
+        }
+      });
 
-    if (code > 0) {
-      throw Error(`Command exited with code ${code}`);
+      if (code > 0) {
+        throw Error(`Command exited with code ${code}`);
+      }
+    } else {
+      ssh.exec(command, [])
     }
     console.log('✅ SSH Action finished.');
     if (ssh.isConnected()) {
