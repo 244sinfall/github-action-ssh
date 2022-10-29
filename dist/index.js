@@ -7305,11 +7305,11 @@ class Client extends EventEmitter {
       this.emit('close');
 
       // Notify outstanding channel requests of disconnection ...
-      const callbacks_ = callbacks;
-      callbacks = this._callbacks = [];
-      const err = new Error('No response from server');
-      for (let i = 0; i < callbacks_.length; ++i)
-        callbacks_[i](err);
+      // const callbacks_ = callbacks;
+      // callbacks = this._callbacks = [];
+      // const err = new Error('No response from server');
+      // for (let i = 0; i < callbacks_.length; ++i)
+      //   callbacks_[i](err);
 
       // Simulate error for any channels waiting to be opened
       this._chanMgr.cleanup(err);
