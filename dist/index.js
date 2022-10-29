@@ -124,7 +124,7 @@ function executeCommand(ssh, command) {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => {
                             console.log('✅ Received feed back from the terminal. Process seem to be started.');
-                            ssh.exec('disown', []).then(() => {
+                            ssh.exec('disown %-', []).then(() => {
                                 if (ssh.isConnected()) {
                                     ssh.dispose();
                                 }
