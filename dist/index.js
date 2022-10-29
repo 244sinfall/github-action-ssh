@@ -7312,7 +7312,7 @@ class Client extends EventEmitter {
       //   callbacks_[i](err);
 
       // Simulate error for any channels waiting to be opened
-      this._chanMgr.cleanup(err);
+      // this._chanMgr.cleanup(err);
     });
 
     // Begin authentication handling ===========================================
